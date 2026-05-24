@@ -43,6 +43,22 @@ Evaluate how far this repository can be built for WebAssembly (`GOOS=js`, `GOARC
 
 `GOOS=js GOARCH=wasm go build ./...` now succeeds in this branch by using a js-safe local replacement for `github.com/moby/term` and by stubbing terminal capability detection to non-terminal behavior on js.
 
+## Current Functional Limitations (after patches)
+
+The following behavior remains intentionally limited for `js/wasm` builds:
+
+1. **No real terminal capability/TTY mode support**
+   - Terminal detection is forced to non-terminal behavior in js shims.
+   - Raw mode, echo control, resize ioctls, and terminal state save/restore are effectively unsupported.
+2. **No POSIX signal handling semantics**
+   - Signal-driven paths are stubbed for js because browser/wasm runtime does not provide Linux-style process signals.
+3. **No process umask behavior**
+   - `Umask` functionality is stubbed as unsupported on js.
+4. **No native `exec` syscall path for plugin execution**
+   - The js build avoids `syscall.Exec` by using unsupported-platform guarded code paths.
+5. **Interactive CLI parity is not guaranteed**
+   - Build compatibility is improved, but environments expecting native terminal/process semantics still cannot behave identically under browser/wasm runtime.
+
 ## Challenges and Resolution Status
 
 ### 1) POSIX signal handling (`interrupt`)
