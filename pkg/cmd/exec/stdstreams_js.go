@@ -1,7 +1,7 @@
-//go:build !windows && !js
+//go:build js
 
 /*
-Copyright 2014 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package util
+package exec
 
 import (
-	"golang.org/x/sys/unix"
+	"io"
+	"os"
 )
 
-// Umask is a wrapper for `unix.Umask()` on non-Windows platforms
-func Umask(mask int) (old int, err error) {
-	return unix.Umask(mask), nil
+func stdStreams() (io.ReadCloser, io.Writer, io.Writer) {
+	return os.Stdin, os.Stdout, os.Stderr
 }

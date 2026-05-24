@@ -23,7 +23,6 @@ import (
 	"net/url"
 	"time"
 
-	dockerterm "github.com/moby/term"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -298,8 +297,7 @@ func (o *StreamOptions) SetupTTY() term.TTY {
 	t.Raw = true
 
 	if o.overrideStreams == nil {
-		// use dockerterm.StdStreams() to get the right I/O handles on Windows
-		o.overrideStreams = dockerterm.StdStreams
+		o.overrideStreams = stdStreams
 	}
 	stdin, stdout, _ := o.overrideStreams()
 	o.In = stdin
