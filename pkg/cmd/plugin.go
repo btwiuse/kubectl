@@ -21,9 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
-	"syscall"
 )
 
 // PluginHandler is capable of parsing command line arguments
@@ -68,23 +66,7 @@ func (h *DefaultPluginHandler) Lookup(filename string) (string, bool) {
 
 // Execute implements PluginHandler
 func (h *DefaultPluginHandler) Execute(executablePath string, cmdArgs, environment []string) error {
-	// Windows does not support exec syscall.
-	if runtime.GOOS == "windows" {
-		cmd := command(executablePath, cmdArgs...)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-		cmd.Env = environment
-		err := cmd.Run()
-		if err == nil {
-			os.Exit(0)
-		}
-		return err
-	}
-
-	// invoke cmd binary relaying the environment and args given
-	// append executablePath to cmdArgs, as execve will make first argument the "binary name".
-	return syscall.Exec(executablePath, append([]string{executablePath}, cmdArgs...), environment)
+	return executePluginBinary(executablePath, cmdArgs, environment)
 }
 
 func command(name string, arg ...string) *exec.Cmd {
